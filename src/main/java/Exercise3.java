@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 
-public class Exercise3 <T>{
+public class Exercise3 {
     private static final String URL_TODO = "https://jsonplaceholder.typicode.com/users/";
 
     public static void toDo(Integer userId) throws IOException, InterruptedException {
@@ -22,15 +22,15 @@ public class Exercise3 <T>{
                 .forEach(userId1 -> System.out.println(userId1.getTitle()));
     }
 
-    public static <T> List<T> sendGet(Integer userId, String url) throws IOException, InterruptedException {
+    public static List<UserId> sendGet(Integer userId, String url) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        Type userListType = new TypeToken<ArrayList<T>>(){}.getType();
-        List<T> users = gson.fromJson(response.body(), userListType);
+        Type userListType = new TypeToken<ArrayList<UserId>>(){}.getType();
+        List<UserId> users = gson.fromJson(response.body(), userListType);
         return users;
     }
 }

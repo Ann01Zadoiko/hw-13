@@ -20,48 +20,49 @@ public class Exercise1 {
     private static final String USER_BY_USERNAME_URL = "https://jsonplaceholder.typicode.com/users?username=";
     private static final String USER_BY_ID = "https://jsonplaceholder.typicode.com/users/";
 
-    public static void sendPost()
-            throws ClientProtocolException, IOException {
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(URI.create(USER_URL));
-        String json = new User().toString();
-        StringEntity entity = new StringEntity(json);
-        httpPost.setEntity(entity);
-        httpPost.setHeader("Accept", "application/json");
-        httpPost.setHeader("Content-type", "application/json");
-        System.out.println(new Gson().toJson(new User()));
-    }
-
-    public static void sendGet() throws IOException, InterruptedException {
+    public static User sendPost(User user)
+            throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(USER_URL))
+                .POST(HttpRequest.BodyPublishers.ofString(new Gson().toJson(user)))
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println(response.body());
+        return new Gson().fromJson(response.body(), User.class);
     }
 
-    public static void sendGet(int id) throws IOException, InterruptedException {
+    public static User sendGet() throws IOException, InterruptedException {
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(USER_URL))
+                .GET()
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        User user = new Gson().fromJson(response.body(), User.class);
+        return user;
+    }
+
+    public static User sendGet(int id) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(USER_URL + "//" + id))
                 .GET()
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println(response.body());
+        return new Gson().fromJson(response.body(), User.class);
     }
 
-    public static void sendGet(String username) throws IOException, InterruptedException {
+    public static User sendGet(String username) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(USER_BY_USERNAME_URL + username ))
                 .GET()
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println(response.body());
+        return new Gson().fromJson(response.body(), User.class);
     }
 
-    public static void sendDelete(int id) throws IOException, InterruptedException {
+    public static User sendDelete(int id) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(USER_BY_ID + id))
                 .header("Content-Type", "application/json")
@@ -70,21 +71,16 @@ public class Exercise1 {
         HttpClient client = HttpClient.newHttpClient();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         System.out.println(response.statusCode());
+        return new Gson().fromJson(response.body(), User.class);
     }
 
-    public static void sendPut(int id) throws IOException, InterruptedException {
-        URL url = new URL(USER_URL + "//" + id);
-        HttpURLConnection http = (HttpURLConnection)url.openConnection();
-        http.setRequestMethod("PUT");
-        http.setDoOutput(true);
-        http.setRequestProperty("Accept", "application/json");
-        http.setRequestProperty("Content-Type", "application/json");
-        Path fileName = Path.of("D:\\111\\Java Core 6\\hw-13\\src\\main\\resources\\user.json");
-        String data = Files.readString(fileName);
-        byte[] out = data.getBytes(StandardCharsets.UTF_8);
-        OutputStream stream = http.getOutputStream();
-        stream.write(out);
-        System.out.println(http.getResponseCode() + " " + http.getResponseMessage());
-        http.disconnect();
+    public static User sendPut(int id, User user) throws IOException, InterruptedException {
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(USER_URL + "//" + id))
+                .PUT(HttpRequest.BodyPublishers.ofString(new Gson().toJson(user)))
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        return new Gson().fromJson(response.body(), User.class);
     }
 }
